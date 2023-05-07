@@ -1,0 +1,14 @@
+
+Deadlock recovery is the process of resolving a deadlock that has already occurred in a computer system. A deadlock is a situation where two or more processes are blocked, each waiting for the other to release resources that they need in order to proceed.
+
+When a deadlock occurs, the operating system needs to take action to resolve the situation and allow the affected processes to continue. There are several techniques that can be used for deadlock recovery, including:
+
+Killing processes: The operating system can forcibly terminate one or more of the processes involved in the deadlock in order to free up the resources they were using.
+
+Resource preemption: The operating system can temporarily seize a resource from one of the processes involved in the deadlock and allocate it to another process that needs it to proceed. The preempted process may be restarted later.
+
+Rollback: The operating system can roll back the progress of one or more of the processes involved in the deadlock to a previous checkpoint, freeing up resources that they were using and allowing them to proceed.
+
+Timeouts: The operating system can set a timer for each process and if the timer expires, it can assume that the process is deadlocked and take action to recover from the deadlock.
+
+Overall, the goal of deadlock recovery is to restore the system to a state where all processes can continue to make progress without getting stuck waiting for resources that are unavailable.

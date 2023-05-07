@@ -1,0 +1,86 @@
+SJF scheduling algorithm with preemption:
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+struct Process {
+    int pid;
+    int burst_time;
+    int arrival_time;
+};
+
+bool compare(Process a, Process b) {
+    return a.arrival_time < b.arrival_time;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    for (int i = 0; i < n; i++) {
+        processes[i].pid = i+1;
+        cout << "Enter burst time for process " << i+1 << ": ";
+        cin >> processes[i].burst_time;
+        cout << "Enter arrival time for process " << i+1 << ": ";
+        cin >> processes[i].arrival_time;
+    }
+
+    sort(processes.begin(), processes.end(), compare);
+
+    int current_time = 0;
+    int total_wait_time = 0;
+    int total_turnaround_time = 0;
+
+    vector<int> remaining_burst_time(n, 0);
+
+    for (int i = 0; i < n; i++) {
+        remaining_burst_time[i] = processes[i].burst_time;
+    }
+
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        int shortest_job_index = -1;
+        int shortest_job_burst_time = 100000;
+
+        for (int i = 0; i < n; i++) {
+            if (remaining_burst_time[i] > 0 && processes[i].arrival_time <= current_time && remaining_burst_time[i] < shortest_job_burst_time) {
+                shortest_job_index = i;
+                shortest_job_burst_time = remaining_burst_time[i];
+            }
+        }
+
+        if (shortest_job_index == -1) {
+            current_time++;
+            continue;
+        }
+
+        remaining_burst_time[shortest_job_index]--;
+
+        if (remaining_burst_time[shortest_job_index] == 0) {
+            completed_processes++;
+
+            int process_wait_time = current_time - processes[shortest_job_index].arrival_time - processes[shortest_job_index].burst_time + 1;
+            total_wait_time += process_wait_time;
+
+            int process_turnaround_time = current_time - processes[shortest_job_index].arrival_time;
+            total_turnaround_time += process_turnaround_time;
+        }
+
+        current_time++;
+    }
+
+    double avg_wait_time = (double)total_wait_time / n;
+    double avg_turnaround_time = (double)total_turnaround_time / n;
+
+    cout << "Average waiting time = " << avg_wait_time << endl;
+    cout << "Average turnaround time = " << avg_turnaround_time << endl;
+
+    return 0;
+}

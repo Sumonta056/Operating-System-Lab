@@ -1,0 +1,5 @@
+A resource allocation graph is a visual representation of the relationships between processes and the resources they need to complete their tasks. In this graph, processes are represented by circles, and resources are represented by rectangles.
+
+Arrows are drawn from processes to the resources they need, and from resources to the processes that are currently using them. This allows you to see which processes are waiting for which resources and which resources are currently in use.
+
+The purpose of a resource allocation graph is to help you identify potential deadlocks, where processes are stuck waiting for resources that are being used by other processes, leading to a cycle of inactivity. By analyzing the graph, you can identify these potential deadlocks and take steps to prevent them from occurring.

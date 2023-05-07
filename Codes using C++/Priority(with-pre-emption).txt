@@ -1,0 +1,89 @@
+ Priority (With Preemption)
+
+
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+struct Process {
+    int id;
+    int burst_time;
+    int arrival_time;
+    int priority;
+    int remaining_time;
+};
+
+bool operator<(const Process& p1, const Process& p2) {
+    return p1.priority < p2.priority;
+}
+
+void calculate_priority_preemption(vector<Process>& processes) {
+    int n = processes.size();
+    int current_time = 0;
+    int total_wait_time = 0;
+    int total_turnaround_time = 0;
+    int completed_processes = 0;
+
+    priority_queue<Process> ready_queue;
+
+    while (completed_processes < n) {
+        // Add newly arrived processes to the ready queue
+        for (int i = 0; i < n; i++) {
+            if (processes[i].arrival_time == current_time) {
+                ready_queue.push(processes[i]);
+            }
+        }
+
+        if (!ready_queue.empty()) {
+            Process current_process = ready_queue.top();
+            ready_queue.pop();
+
+            if (current_process.remaining_time == current_process.burst_time) {
+                int process_wait_time = current_time - current_process.arrival_time;
+                total_wait_time += process_wait_time;
+            }
+
+            current_process.remaining_time--;
+
+            if (current_process.remaining_time == 0) {
+                int process_turnaround_time = current_time - current_process.arrival_time;
+                total_turnaround_time += process_turnaround_time;
+                completed_processes++;
+            } else {
+                ready_queue.push(current_process);
+            }
+        }
+
+        current_time++;
+    }
+
+    double avg_wait_time = (double) total_wait_time / n;
+    double avg_turnaround_time = (double) total_turnaround_time / n;
+
+    cout << "Priority with preemption:" << endl;
+    cout << "Average waiting time = " << avg_wait_time << endl;
+    cout << "Average turnaround time = " << avg_turnaround_time << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter the burst time, arrival time and priority of process " << i+1 << ": ";
+        cin >> processes[i].burst_time >> processes[i].arrival_time >> processes[i].priority;
+        processes[i].id = i+1;
+        processes[i].remaining_time = processes[i].burst_time;
+    }
+
+    calculate_priority_preemption(processes);
+
+    return 0;
+}

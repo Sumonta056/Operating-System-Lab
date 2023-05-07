@@ -1,0 +1,77 @@
+Round Robin scheduling algorithm (with variable time quantum) :
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct Process {
+    int process_id;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    int wait_time;
+    int turnaround_time;
+};
+
+void calculate_round_robin(vector<Process>& processes, vector<int>& time_quantum) {
+    int n = processes.size();
+    int current_time = 0;
+    int total_wait_time = 0;
+    int total_turnaround_time = 0;
+    int completed = 0;
+
+    while (completed < n) {
+        for (int i = 0; i < n; i++) {
+            if (processes[i].remaining_time > 0) {
+                int quantum = min(time_quantum[i], processes[i].remaining_time);
+                current_time += quantum;
+                processes[i].remaining_time -= quantum;
+
+                if (processes[i].remaining_time == 0) {
+                    completed++;
+                    processes[i].turnaround_time = current_time - processes[i].arrival_time;
+                    processes[i].wait_time = processes[i].turnaround_time - processes[i].burst_time;
+                }
+            }
+        }
+    }
+
+    for (auto& process : processes) {
+        total_wait_time += process.wait_time;
+        total_turnaround_time += process.turnaround_time;
+    }
+
+    double avg_wait_time = (double)total_wait_time / n;
+    double avg_turnaround_time = (double)total_turnaround_time / n;
+
+    cout << "Average Waiting Time (AWT): " << avg_wait_time << endl;
+    cout << "Average Turnaround Time (ATT): " << avg_turnaround_time << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+    vector<int> time_quantum(n);
+
+    cout << "Enter the burst time, arrival time, and time quantum for each process:" << endl;
+    for (int i = 0; i < n; i++) {
+        processes[i].process_id = i + 1;
+        cout << "Process " << processes[i].process_id << endl;
+        cout << "Burst time: ";
+        cin >> processes[i].burst_time;
+        cout << "Arrival time: ";
+        cin >> processes[i].arrival_time;
+        cout << "Time quantum: ";
+        cin >> time_quantum[i];
+        processes[i].remaining_time = processes[i].burst_time;
+        cout << endl;
+    }
+
+    calculate_round_robin(processes, time_quantum);
+
+    return 0;
+}

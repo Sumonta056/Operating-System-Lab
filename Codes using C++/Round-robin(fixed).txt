@@ -1,0 +1,91 @@
+Round Robin scheduling algorithm (with fixed time quantum) :
+
+
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+struct Process {
+    int id;
+    int burst_time;
+    int arrival_time;
+    int remaining_time;
+    int start_time;
+    int end_time;
+};
+
+bool compare_arrival_time(Process p1, Process p2) {
+    return p1.arrival_time < p2.arrival_time;
+}
+
+void calculate_round_robin(vector<Process>& processes, int time_quantum) {
+    int n = processes.size();
+    int current_time = 0;
+    int total_wait_time = 0;
+    int total_turnaround_time = 0;
+    queue<Process> ready_queue;
+
+    sort(processes.begin(), processes.end(), compare_arrival_time);
+
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i+1;
+        processes[i].remaining_time = processes[i].burst_time;
+    }
+
+    ready_queue.push(processes[0]);
+
+    while (!ready_queue.empty()) {
+        Process current_process = ready_queue.front();
+        ready_queue.pop();
+
+        if (current_process.remaining_time <= time_quantum) {
+            current_time += current_process.remaining_time;
+            current_process.remaining_time = 0;
+        } else {
+            current_time += time_quantum;
+            current_process.remaining_time -= time_quantum;
+        }
+
+        while (processes.size() > 1 && i < n-1 && processes[i+1].arrival_time <= current_time) {
+            i++;
+            ready_queue.push(processes[i]);
+        }
+
+        if (current_process.remaining_time == 0) {
+            current_process.end_time = current_time;
+            total_turnaround_time += current_process.end_time - current_process.arrival_time;
+            total_wait_time += current_process.end_time - current_process.arrival_time - current_process.burst_time;
+        } else {
+            ready_queue.push(current_process);
+        }
+    }
+
+    double avg_wait_time = (double) total_wait_time / n;
+    double avg_turnaround_time = (double) total_turnaround_time / n;
+
+    cout << "Round Robin with time quantum " << time_quantum << ":" << endl;
+    cout << "Average waiting time = " << avg_wait_time << endl;
+    cout << "Average turnaround time = " << avg_turnaround_time << endl;
+}
+
+int main() {
+    int n, time_quantum;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter the burst time and arrival time of process " << i+1 << ": ";
+        cin >> processes[i].burst_time >> processes[i].arrival_time;
+    }
+
+    cout << "Enter the time quantum: ";
+    cin >> time_quantum;
+
+    calculate_round_robin(processes, time_quantum);
+
+    return 0;
+}

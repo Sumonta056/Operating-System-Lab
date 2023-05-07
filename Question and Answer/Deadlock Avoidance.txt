@@ -1,0 +1,9 @@
+Deadlock avoidance is a strategy used in computer operating systems to prevent deadlocks from occurring. A deadlock is a situation where two or more processes are stuck waiting for each other to release resources, and as a result, none of them can proceed.
+
+In order to avoid deadlocks, the operating system uses algorithms that carefully manage the allocation of resources to processes. These algorithms analyze the current state of the system, including which processes are currently using which resources, and make decisions about how to allocate resources in a way that minimizes the risk of deadlocks.
+
+One common approach to deadlock avoidance is to use a resource allocation graph, which is a visual representation of the relationships between processes and resources. The operating system can analyze the graph to identify potential deadlocks and take action to prevent them from occurring.
+
+Another approach is to use a technique called resource ordering, where processes are required to request resources in a specific order, to prevent circular waiting. The operating system can also use techniques such as timeouts and preemption to prevent processes from waiting indefinitely for resources.
+
+Overall, the goal of deadlock avoidance is to ensure that resources are allocated in a way that allows all processes to complete their tasks without getting stuck waiting for each other indefinitely

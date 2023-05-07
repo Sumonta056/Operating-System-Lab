@@ -1,0 +1,105 @@
+SRF(The preemptive version of SJF where the selection of any process from the ready queue depends on the minimum (additional) CPU burst to complete the task):
+
+
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+struct Process {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    int finish_time;
+    int waiting_time;
+    int turnaround_time;
+    int additional_burst_time;
+};
+
+struct CompareProcess {
+    bool operator()(const Process& p1, const Process& p2) {
+        return p1.additional_burst_time > p2.additional_burst_time;
+    }
+};
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    cout << "Enter the arrival time and burst time for each process:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> processes[i].arrival_time >> processes[i].burst_time;
+        processes[i].remaining_time = processes[i].burst_time;
+        processes[i].pid = i+1;
+    }
+
+    priority_queue<Process, vector<Process>, CompareProcess> ready_queue;
+    int current_time = 0;
+    int completed_processes = 0;
+    int total_wait_time = 0;
+    int total_turnaround_time = 0;
+
+    while (completed_processes < n) {
+        // Check if any process has arrived
+        for (int i = 0; i < n; i++) {
+            if (processes[i].arrival_time == current_time) {
+                ready_queue.push(processes[i]);
+            }
+        }
+
+        if (!ready_queue.empty()) {
+            Process current_process = ready_queue.top();
+            ready_queue.pop();
+
+            // Preempt the process if there is another process with a shorter remaining time
+            for (int i = 0; i < n; i++) {
+                if (processes[i].arrival_time <= current_time && processes[i].remaining_time < current_process.remaining_time && processes[i].remaining_time > 0) {
+                    current_process.additional_burst_time = current_process.remaining_time;
+                    ready_queue.push(current_process);
+                    current_process = processes[i];
+                }
+            }
+
+            // Execute the current process for 1 unit of time
+            current_process.remaining_time--;
+            current_time++;
+
+            // Check if the current process has completed its execution
+            if (current_process.remaining_time == 0) {
+                // Set finish time for the process
+                current_process.finish_time = current_time;
+                
+                // Set waiting time for the process
+                current_process.waiting_time = current_process.finish_time - current_process.arrival_time - current_process.burst_time;
+                
+                // Set turnaround time for the process
+                current_process.turnaround_time = current_process.finish_time - current_process.arrival_time;
+                
+                // Update total wait time and total turnaround time
+                total_wait_time += current_process.waiting_time;
+                total_turnaround_time += current_process.turnaround_time;
+                
+                // Mark the process as completed
+                completed_processes++;
+            } else {
+                current_process.additional_burst_time = current_process.remaining_time;
+                ready_queue.push(current_process);
+            }
+        } else {
+            current_time++;
+        }
+    }
+
+    double avg_wait_time = (double) total_wait_time / n;
+    double avg_turnaround_time = (double) total_turnaround_time / n;
+
+    cout << "Average Waiting Time: " << avg_wait_time << endl;
+    cout << "Average Turnaround Time: " << avg_turnaround_time << endl;
+
+    return 0;
+}
